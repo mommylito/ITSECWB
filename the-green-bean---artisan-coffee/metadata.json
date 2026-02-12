@@ -1,8 +1,0 @@
-
-{
-  "name": "The Green Bean - Artisan Coffee",
-  "description": "A high-security coffee shop management application featuring SQL-backed authentication, anti-brute force protection, and an AI-powered barista assistant.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}
