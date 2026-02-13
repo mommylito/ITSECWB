@@ -61,6 +61,10 @@ $user = $stmt->fetch();
                     <label class="block text-xs font-bold uppercase text-stone-400">Full Name</label>
                     <input type="text" name="full_name" value="<?= htmlspecialchars($user['full_name']) ?>" class="w-full p-3 border rounded-lg mt-1">
                 </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-stone-400">Phone Number</label>
+                    <input type="tel" value="<?= htmlspecialchars($user['phone_number']) ?>" class="w-full p-3 border rounded-lg mt-1 bg-stone-100" readonly>
+                </div>
                 <button type="submit" name="update_profile" class="w-full py-3 bg-emerald-800 text-white rounded-xl font-bold">Save Changes</button>
             </form>
             <a href="index.php" class="block text-center mt-6 text-stone-500">Back to Menu</a>

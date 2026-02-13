@@ -6,11 +6,14 @@ $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['full_name']);
     $email = trim($_POST['email']);
+    $phone = trim($_POST['phone_number']);
     $pass = $_POST['password'];
     $profile_photo = null;
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $err = "Invalid email format.";
+    } elseif (!preg_match('/^09\d{9}$/', $phone)) {
+        $err = "Phone number must start with 09 and be exactly 11 digits.";
     } elseif (strlen($pass) < 8) {
         $err = "Password must be at least 8 characters.";
     } else {
@@ -31,12 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$err) {
             $hash = password_hash($pass, PASSWORD_BCRYPT);
             try {
-                $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, profile_photo) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$name, $email, $hash, $profile_photo]);
+                $stmt = $pdo->prepare("INSERT INTO users (full_name, email, phone_number, password_hash, profile_photo) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$name, $email, $phone, $hash, $profile_photo]);
                 header("Location: login.php?registered=1");
                 exit;
             } catch (PDOException $e) {
-                $err = "Email already registered.";
+                $err = "Email or phone number already registered.";
             }
         }
     }
@@ -61,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <input type="text" name="full_name" required placeholder="Full Name" class="w-full p-3 border rounded-lg">
             <input type="email" name="email" required placeholder="Email" class="w-full p-3 border rounded-lg">
+            <input type="tel" name="phone_number" required placeholder="Phone (09XXXXXXXXX)" pattern="09[0-9]{9}" maxlength="11" class="w-full p-3 border rounded-lg" title="Must start with 09 and be 11 digits">
             <input type="password" name="password" required placeholder="Password (Min 8 chars)" class="w-full p-3 border rounded-lg">
             <button type="submit" class="w-full py-3 bg-emerald-800 text-white rounded-lg font-bold">Join Community</button>
         </form>

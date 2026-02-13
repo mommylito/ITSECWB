@@ -8,6 +8,7 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
+    phone_number VARCHAR(11) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     profile_photo LONGTEXT,
     role ENUM('admin', 'user') DEFAULT 'user',
@@ -108,10 +109,11 @@ INSERT INTO menu_items (name, price, description, category_id) VALUES
 
 -- Default Admin User
 -- Password: admin123 (bcrypt hash for demo purposes only)
-INSERT INTO users (full_name, email, password_hash, role)
+INSERT INTO users (full_name, email, phone_number, password_hash, role)
 VALUES (
     'Head Barista',
     'admin@greenbean.com',
+    '09173055555',
     '$2y$10$89WjO.fW6I7t7/yI8K2Lh.vS8.mYm0q7z3j2k1l9o8p7q6r5s4t3u',
     'admin'
 );
