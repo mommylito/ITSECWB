@@ -104,7 +104,7 @@ layout_header('My Reviews');
                     <input type="number" name="cups_count" min="1" value="<?= h((string) ($editReview['cups_count'] ?? 1)) ?>" class="w-full rounded-xl border border-stone-300 px-4 py-3" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2">Budget spent</label>
+                    <label class="block text-sm font-medium mb-2">Spent</label>
                     <input type="number" name="spending_amount" min="0" step="0.01" value="<?= h((string) ($editReview['spending_amount'] ?? '0.00')) ?>" class="w-full rounded-xl border border-stone-300 px-4 py-3" required>
                 </div>
                 <div>
