@@ -1,74 +1,74 @@
-
 <?php
-session_start();
-require_once 'db_connect.php';
+declare(strict_types=1);
 
-if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit; }
+require_once __DIR__ . '/bootstrap.php';
 
-$user_id = $_SESSION['user_id'];
-$msg = '';
-$err = '';
+require_login();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['update_profile'])) {
-        $name = $_POST['full_name'];
-        
-        // Handle File Upload with Security
-        if (!empty($_FILES['photo']['tmp_name'])) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime = finfo_file($finfo, $_FILES['photo']['tmp_name']);
-            finfo_close($finfo);
+$userId = current_user_id();
+$error = null;
 
-            if (in_array($mime, ['image/jpeg', 'image/png'])) {
-                $data = file_get_contents($_FILES['photo']['tmp_name']);
-                $base64 = 'data:' . $mime . ';base64,' . base64_encode($data);
-                $pdo->prepare("UPDATE users SET full_name = ?, profile_photo = ? WHERE id = ?")->execute([$name, $base64, $user_id]);
-                $msg = "Profile updated!";
-            } else {
-                $err = "Invalid file type. Only JPG/PNG allowed.";
-            }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
+    verify_csrf();
+
+    $fullName = trim((string) ($_POST['full_name'] ?? ''));
+    $phone = trim((string) ($_POST['phone_number'] ?? ''));
+
+    if ($fullName === '') {
+        $error = 'Full name is required.';
+    } elseif (!preg_match('/^09\d{9}$/', $phone)) {
+        $error = 'Phone number must start with 09 and contain exactly 11 digits.';
+    } else {
+        $photo = uploaded_photo_data($_FILES['photo'] ?? null);
+
+        if ($photo !== null) {
+            $stmt = $pdo->prepare('UPDATE users SET full_name = ?, phone_number = ?, profile_photo = ? WHERE id = ?');
+            $stmt->execute([$fullName, $phone, $photo, $userId]);
         } else {
-            $pdo->prepare("UPDATE users SET full_name = ? WHERE id = ?")->execute([$name, $user_id]);
-            $msg = "Name updated!";
+            $stmt = $pdo->prepare('UPDATE users SET full_name = ?, phone_number = ? WHERE id = ?');
+            $stmt->execute([$fullName, $phone, $userId]);
         }
+
+        $_SESSION['full_name'] = $fullName;
+        app_log('user', 'Profile updated', ['user_id' => $userId]);
+        flash('success', 'Profile updated successfully.');
+        redirect('profile.php');
     }
 }
 
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$user_id]);
+$stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
+$stmt->execute([$userId]);
 $user = $stmt->fetch();
+
+layout_header('Profile');
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>My Profile - Green Bean</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-stone-50">
-    <div class="max-w-2xl mx-auto py-12">
-        <div class="bg-white p-10 rounded-3xl shadow-xl">
-            <h2 class="text-3xl font-serif mb-6">My Profile</h2>
-            <?php if($msg): ?> <div class="p-3 bg-green-50 text-green-700 rounded mb-4"><?= $msg ?></div> <?php endif; ?>
-            <?php if($err): ?> <div class="p-3 bg-red-50 text-red-700 rounded mb-4"><?= $err ?></div> <?php endif; ?>
-            
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                <div class="flex flex-col items-center mb-8">
-                    <img src="<?= $user['profile_photo'] ?: 'https://picsum.photos/200' ?>" class="w-32 h-32 rounded-full border-4 border-stone-100 shadow-md object-cover">
-                    <input type="file" name="photo" class="mt-4 text-xs">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-stone-400">Full Name</label>
-                    <input type="text" name="full_name" value="<?= htmlspecialchars($user['full_name']) ?>" class="w-full p-3 border rounded-lg mt-1">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-stone-400">Phone Number</label>
-                    <input type="tel" value="<?= htmlspecialchars($user['phone_number']) ?>" class="w-full p-3 border rounded-lg mt-1 bg-stone-100" readonly>
-                </div>
-                <button type="submit" name="update_profile" class="w-full py-3 bg-emerald-800 text-white rounded-xl font-bold">Save Changes</button>
-            </form>
-            <a href="index.php" class="block text-center mt-6 text-stone-500">Back to Menu</a>
+<div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-stone-200 p-8">
+    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-700">My Profile</p>
+    <h1 class="mt-3 text-4xl font-display"><?= h($user['full_name']) ?></h1>
+
+    <?php if ($error): ?>
+        <div class="mt-6 rounded-xl bg-red-50 border border-red-200 text-red-800 px-4 py-3"><?= h($error) ?></div>
+    <?php endif; ?>
+
+    <form method="POST" enctype="multipart/form-data" class="mt-6 space-y-5">
+        <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
+        <div class="flex flex-col items-center gap-4">
+            <img src="<?= h($user['profile_photo'] ?: 'https://picsum.photos/240?grayscale') ?>" alt="Profile photo" class="w-32 h-32 rounded-full object-cover border-4 border-stone-100 shadow-md">
+            <input type="file" name="photo" accept="image/png,image/jpeg" class="text-sm">
         </div>
-    </div>
-</body>
-</html>
+        <div>
+            <label class="block text-sm font-medium mb-2">Full name</label>
+            <input type="text" name="full_name" value="<?= h($user['full_name']) ?>" class="w-full rounded-xl border border-stone-300 px-4 py-3" required>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Email</label>
+            <input type="email" value="<?= h($user['email']) ?>" class="w-full rounded-xl border border-stone-200 bg-stone-100 px-4 py-3" readonly>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Phone number</label>
+            <input type="tel" name="phone_number" value="<?= h($user['phone_number']) ?>" pattern="09[0-9]{9}" maxlength="11" class="w-full rounded-xl border border-stone-300 px-4 py-3" required>
+        </div>
+        <button type="submit" name="update_profile" class="w-full rounded-xl bg-emerald-800 text-white px-4 py-3 font-semibold">Save changes</button>
+    </form>
+</div>
+<?php layout_footer(); ?>

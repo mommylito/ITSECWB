@@ -1,0 +1,7 @@
+[2026-04-05 06:14:38] AUTH           User registered {"email":"marcusbrentgo@gmail.com"}
+[2026-04-05 06:14:43] AUTH           Login successful {"user_id":3,"role":"user"}
+[2026-04-05 07:08:17] AUTH           Session timed out {"user_id":3}
+[2026-04-06 12:31:52] ERROR          Unhandled exception {"message":"SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it","file":"C:\\xampp\\htdocs\\ITSECWB\\db_connect.php","line":13}
+[2026-04-06 13:28:25] AUTH           Login failed for unknown email {"email":"marcusbrentgo@gmail.com"}
+[2026-04-06 13:28:34] AUTH           User registered {"email":"marcusbrentgo@gmail.com"}
+[2026-04-06 13:28:38] AUTH           Login successful {"user_id":3,"role":"user"}

@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Keep HTTPS support ready for Apache SSL / self-signed certificates.
+RewriteCond %{HTTPS} !=on
+RewriteCond %{SERVER_PORT} 443
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=302]
+
+Options -Indexes
