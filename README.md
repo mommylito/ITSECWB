@@ -19,6 +19,7 @@ SQL-based coffee shop website for Milestone 2.
    - create menu item
    - update menu item
    - delete menu item
+   - lock users
    - unlock locked users
    - update order status
 6. Logging to `logs/app.log` for:

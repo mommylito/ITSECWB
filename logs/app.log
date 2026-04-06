@@ -5,3 +5,11 @@
 [2026-04-06 13:28:25] AUTH           Login failed for unknown email {"email":"marcusbrentgo@gmail.com"}
 [2026-04-06 13:28:34] AUTH           User registered {"email":"marcusbrentgo@gmail.com"}
 [2026-04-06 13:28:38] AUTH           Login successful {"user_id":3,"role":"user"}
+[2026-04-06 13:47:43] AUTH           User logged out {"user_id":3}
+[2026-04-06 13:47:48] AUTH           Login successful {"user_id":1,"role":"admin"}
+[2026-04-06 13:52:57] ADMIN          Order status updated {"admin_id":1,"order_id":1,"status":"pending"}
+[2026-04-06 13:52:59] ADMIN          Order status updated {"admin_id":1,"order_id":1,"status":"completed"}
+[2026-04-06 13:53:01] ADMIN          Order status updated {"admin_id":1,"order_id":1,"status":"cancelled"}
+[2026-04-06 13:53:02] ADMIN          Order status updated {"admin_id":1,"order_id":1,"status":"completed"}
+[2026-04-06 14:06:18] ADMIN          Order status updated {"admin_id":1,"order_id":1,"status":"pending"}
+[2026-04-06 14:06:20] ADMIN          Order status updated {"admin_id":1,"order_id":1,"status":"completed"}
