@@ -15,15 +15,11 @@
 ## Security controls included
 
 - session timeout after 15 minutes
-- log file output in `logs/app.log`
+- log file output in `logs/app.log` and `OS Syslog`
 - role-based admin page
 - database transactions for order creation
 - customer review CRUD for signed-in users
 - debug-aware error page handling
 - HTTPS-ready config with self-signed certificate support
 
-## HTTPS
 
-If Apache SSL is enabled, open the app with `https://localhost/ITSECWB/`.
-
-To force HTTPS redirects after SSL is working, set `FORCE_HTTPS` to `true` in [`config.php`](/C:/xampp/htdocs/ITSECWB/config.php).

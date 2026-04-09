@@ -9,15 +9,30 @@ if (!is_dir(__DIR__ . '/logs')) {
 
 function app_log(string $type, string $message, array $context = []): void
 {
+    $formattedContext = $context ? json_encode($context, JSON_UNESCAPED_SLASHES) : '';
     $line = sprintf(
         "[%s] %-14s %s %s%s",
         date('Y-m-d H:i:s'),
         strtoupper($type),
         $message,
-        $context ? json_encode($context, JSON_UNESCAPED_SLASHES) : '',
+        $formattedContext,
         PHP_EOL
     );
+    
+    // Log to strictly local file
     error_log($line, 3, LOG_FILE);
+    
+    // Log directly to the OS syslog
+    openlog('ITSECWB_GreenBean', LOG_PID | LOG_PERROR, LOG_USER);
+    $syslogPriority = match (strtolower($type)) {
+        'error' => LOG_ERR,
+        'auth' => LOG_WARNING,
+        'admin' => LOG_INFO,
+        default => LOG_INFO,
+    };
+    $syslogMessage = sprintf("[%s] %s %s", strtoupper($type), $message, $formattedContext);
+    syslog($syslogPriority, $syslogMessage);
+    closelog();
 }
 
 function render_error_page(Throwable $exception): void
